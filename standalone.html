@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Ramzan's Eye & General Clinic</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- React, ReactDOM, Babel, Motion, Lucide -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+        .prose {
+            line-height: 1.6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        blue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+        const { motion, AnimatePresence } = FramerMotion;
+
+        // --- Data ---
+        const servicesData = [
+          {
+            id: 'cataract-surgery',
+            slug: 'cataract-surgery',
+            title: 'Cataract Surgery',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Advanced micro-incision surgery to replace cloudy lenses with clear intraocular lenses (IOLs).',
+            longDescription: 'Cataract surgery is one of the most common and successful procedures performed worldwide. At Dr. Ramzan\'s Clinic, we use the latest Phacoemulsification technology, which allows for micro-incisions that typically require no stitches. We offer a range of premium intraocular lenses (IOLs) tailored to your lifestyle needs, including multifocal and toric lenses to reduce dependence on glasses.',
+            benefits: [
+              'Significant improvement in visual clarity',
+              'Enhanced color perception',
+              'Reduced glare and sensitivity to light',
+              'Faster recovery with micro-incision techniques',
+              'Improved quality of life and independence'
+            ],
+            faqs: [
+              {
+                question: 'Is cataract surgery painful?',
+                answer: 'No, the procedure is typically painless. We use local anesthetic drops to numb the eye, and most patients only feel a slight pressure during the 15-20 minute surgery.'
+              },
+              {
+                question: 'How long is the recovery period?',
+                answer: 'Most patients notice a significant improvement in vision within 24-48 hours. Full healing usually takes about 4-6 weeks, during which you will use prescribed eye drops.'
+              },
+              {
+                question: 'Can cataracts come back?',
+                answer: 'No, once a cataract is removed, it cannot grow back. However, some patients may develop a "secondary cataract" (clouding of the lens capsule), which can be easily treated with a quick laser procedure.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/cataract/1200/600'
+          },
+          {
+            id: 'eye-exams',
+            slug: 'eye-exams',
+            title: 'Comprehensive Eye Exams',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Thorough testing of vision and eye health using state-of-the-art diagnostic equipment.',
+            longDescription: 'A comprehensive eye exam is more than just checking your vision for glasses. It is a vital part of your overall health maintenance. Our exams include testing for visual acuity, eye pressure (tonometry), retinal health, and screening for conditions like glaucoma, macular degeneration, and diabetic retinopathy.',
+            benefits: [
+              'Early detection of sight-threatening diseases',
+              'Accurate prescription for glasses or contacts',
+              'Monitoring of systemic health issues like hypertension',
+              'Personalized advice on digital eye strain',
+              'Baseline health records for future comparison'
+            ],
+            faqs: [
+              {
+                question: 'How often should I have an eye exam?',
+                answer: 'Most adults should have a comprehensive eye exam every 1-2 years. If you have existing conditions like diabetes or a family history of glaucoma, annual exams are strongly recommended.'
+              },
+              {
+                question: 'Will my pupils be dilated?',
+                answer: 'In many cases, yes. Dilation allows the doctor to get a better view of the back of your eye. Your vision may be blurry and sensitive to light for a few hours afterward.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/eyeexam/1200/600'
+          },
+          {
+            id: 'glaucoma-management',
+            slug: 'glaucoma-management',
+            title: 'Glaucoma Management',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Monitoring and treatment of intraocular pressure to prevent optic nerve damage.',
+            longDescription: 'Glaucoma is often called the "silent thief of sight" because it typically has no symptoms until significant vision loss has occurred. Our management program focuses on early detection through advanced imaging (OCT) and visual field testing, followed by personalized treatment plans involving eye drops, laser therapy, or surgery to lower eye pressure.',
+            benefits: [
+              'Prevention of permanent vision loss',
+              'Advanced diagnostic tracking of the optic nerve',
+              'Access to the latest pressure-lowering medications',
+              'Minimally invasive surgical options if needed',
+              'Regular monitoring to ensure treatment effectiveness'
+            ],
+            faqs: [
+              {
+                question: 'Can glaucoma be cured?',
+                answer: 'Currently, there is no cure for glaucoma, and vision lost cannot be restored. However, with proper management and treatment, further vision loss can almost always be prevented.'
+              },
+              {
+                question: 'What are the symptoms of glaucoma?',
+                answer: 'Most forms of glaucoma have no early symptoms. Acute angle-closure glaucoma, however, can cause sudden eye pain, headache, and blurred vision, which is a medical emergency.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/glaucoma/1200/600'
+          },
+          {
+            id: 'pediatric-ophthalmology',
+            slug: 'pediatric-ophthalmology',
+            title: 'Pediatric Ophthalmology',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Specialized eye care for infants and children, focusing on developmental vision issues.',
+            longDescription: 'Children\'s eyes are still developing, and early intervention is key to preventing long-term vision problems. We specialize in treating common childhood issues such as amblyopia (lazy eye), strabismus (crossed eyes), and refractive errors. Our clinic is designed to be child-friendly to ensure a comfortable experience for our youngest patients.',
+            benefits: [
+              'Early correction of developmental vision issues',
+              'Support for academic and athletic success',
+              'Prevention of permanent vision loss from lazy eye',
+              'Child-friendly diagnostic environment',
+              'Expert guidance for parents on eye safety'
+            ],
+            faqs: [
+              {
+                question: 'When should a child have their first eye exam?',
+                answer: 'The American Optometric Association recommends a first exam at 6 months of age, followed by another at age 3, and then before starting school.'
+              },
+              {
+                question: 'How can I tell if my child has vision problems?',
+                answer: 'Signs include squinting, tilting the head, sitting too close to the TV, rubbing eyes frequently, or avoiding reading and other near-work.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/pediatric/1200/600'
+          },
+          {
+            id: 'diabetic-retinopathy',
+            slug: 'diabetic-retinopathy',
+            title: 'Diabetic Retinopathy',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Specialized screening and treatment for eye complications caused by diabetes.',
+            longDescription: 'Diabetes can damage the blood vessels in the retina, leading to diabetic retinopathy. We provide comprehensive screenings using high-resolution retinal photography and OCT. Treatment options include laser therapy and intravitreal injections to manage swelling and prevent further damage.',
+            benefits: [
+              'Prevention of severe vision loss and blindness',
+              'Early detection of retinal changes',
+              'Coordinated care with your primary physician',
+              'Access to advanced laser and injection therapies',
+              'Education on blood sugar control and eye health'
+            ],
+            faqs: [
+              {
+                question: 'Can I have retinopathy without knowing it?',
+                answer: 'Yes, early stages of diabetic retinopathy often have no symptoms. By the time you notice vision changes, the disease may be advanced, which is why annual screenings are vital.'
+              },
+              {
+                question: 'Is the damage reversible?',
+                answer: 'While some treatments can improve vision, the primary goal is to stabilize the condition and prevent further loss. Controlling blood sugar is the best way to prevent damage.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/diabetic/1200/600'
+          },
+          {
+            id: 'refractive-surgery',
+            slug: 'refractive-surgery',
+            title: 'Refractive Surgery',
+            category: 'Eye Care',
+            icon: 'Eye',
+            description: 'Consultation and procedures like LASIK to correct myopia, hyperopia, and astigmatism.',
+            longDescription: 'Refractive surgery can reduce or eliminate your dependence on glasses and contact lenses. We provide detailed pre-operative evaluations to determine if you are a candidate for procedures like LASIK, PRK, or ICL (Implantable Collamer Lens). We guide you through the entire process, from initial consultation to post-operative care.',
+            benefits: [
+              'Freedom from glasses and contact lenses',
+              'Rapid recovery and visual improvement',
+              'Enhanced peripheral vision compared to glasses',
+              'Long-term cost savings on eyewear',
+              'Improved convenience for sports and outdoor activities'
+            ],
+            faqs: [
+              {
+                question: 'Am I a candidate for LASIK?',
+                answer: 'Candidates must be over 18, have a stable prescription for at least a year, and have healthy corneas. A detailed evaluation of corneal thickness and shape is required.'
+              },
+              {
+                question: 'Is the procedure permanent?',
+                answer: 'Yes, refractive surgery permanently reshapes the cornea. However, it does not prevent age-related vision changes like presbyopia (the need for reading glasses) which typically occurs after age 40.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/lasik/1200/600'
+          },
+          {
+            id: 'primary-care',
+            slug: 'primary-care',
+            title: 'Primary Care',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'Your first point of contact for all health concerns, from common colds to general wellness.',
+            longDescription: 'Our primary care services focus on the "whole person." We manage acute illnesses like the flu and infections, provide preventive care, and coordinate with specialists when needed. Dr. Ramzan emphasizes building long-term relationships with patients to provide personalized and continuous care.',
+            benefits: [
+              'Holistic health management',
+              'Continuity of care with a trusted doctor',
+              'Early intervention for acute illnesses',
+              'Personalized health education',
+              'Coordination of specialist referrals'
+            ],
+            faqs: [
+              {
+                question: 'Do I need an appointment for a cold?',
+                answer: 'While we recommend booking an appointment, we do handle urgent walk-ins based on severity. Calling ahead helps us minimize your wait time.'
+              },
+              {
+                question: 'What should I bring to my first visit?',
+                answer: 'Please bring your ID, any current medications (or a list), and any previous medical records or lab results you have.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/primary/1200/600'
+          },
+          {
+            id: 'chronic-disease-management',
+            slug: 'chronic-disease-management',
+            title: 'Chronic Disease Management',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'Long-term care plans for conditions like hypertension, diabetes, and asthma.',
+            longDescription: 'Managing a chronic condition requires a partnership between doctor and patient. We create customized care plans that include regular monitoring, medication management, and lifestyle adjustments. Our goal is to prevent complications and help you maintain the highest possible quality of life.',
+            benefits: [
+              'Reduced risk of serious complications',
+              'Optimized medication regimens',
+              'Regular monitoring of vital health markers',
+              'Empowerment through disease education',
+              'Better long-term health outcomes'
+            ],
+            faqs: [
+              {
+                question: 'How often do I need checkups for diabetes?',
+                answer: 'Typically, we recommend checkups every 3 months to monitor your A1c levels and adjust your treatment plan as needed.'
+              },
+              {
+                question: 'Can lifestyle changes really help?',
+                answer: 'Absolutely. Diet, exercise, and stress management are foundational to managing conditions like hypertension and type 2 diabetes, often reducing the amount of medication needed.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/chronic/1200/600'
+          },
+          {
+            id: 'preventive-screenings',
+            slug: 'preventive-screenings',
+            title: 'Preventive Screenings',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'Proactive tests to identify health risks before they become serious problems.',
+            longDescription: 'Prevention is better than cure. We offer a variety of screenings tailored to your age, gender, and family history. This includes blood pressure checks, cholesterol panels, cancer screenings, and bone density tests. Identifying risks early allows for simpler and more effective interventions.',
+            benefits: [
+              'Early detection of serious health issues',
+              'Peace of mind regarding your health status',
+              'Lower long-term healthcare costs',
+              'Personalized risk assessment',
+              'Proactive approach to aging'
+            ],
+            faqs: [
+              {
+                question: 'Which screenings do I need?',
+                answer: 'This depends on your age, gender, and risk factors. During a wellness visit, Dr. Ramzan will create a personalized screening schedule for you.'
+              },
+              {
+                question: 'Are screenings covered by insurance?',
+                answer: 'Most preventive screenings are covered by major insurance plans. We recommend checking with your provider for specific coverage details.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/screening/1200/600'
+          },
+          {
+            id: 'vaccinations',
+            slug: 'vaccinations',
+            title: 'Vaccinations',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'Administration of essential vaccines for children and adults to prevent infectious diseases.',
+            longDescription: 'Vaccines are one of the most effective ways to protect yourself and your community from serious diseases. We provide a full range of immunizations, including childhood vaccines, annual flu shots, hepatitis boosters, and travel vaccinations.',
+            benefits: [
+              'Protection against life-threatening diseases',
+              'Contribution to community (herd) immunity',
+              'Safe and effective prevention',
+              'Travel-specific health protection',
+              'Up-to-date immunization records'
+            ],
+            faqs: [
+              {
+                question: 'Are adult boosters necessary?',
+                answer: 'Yes, many vaccines like Tetanus require boosters every 10 years. Others, like the flu shot, are needed annually due to changing virus strains.'
+              },
+              {
+                question: 'Do you provide travel vaccines?',
+                answer: 'Yes, we provide consultations for international travel and can administer required vaccines like Yellow Fever or Typhoid depending on your destination.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/vaccine/1200/600'
+          },
+          {
+            id: 'lab-services',
+            slug: 'lab-services',
+            title: 'Lab Services',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'On-site sample collection and analysis for blood, urine, and other diagnostic tests.',
+            longDescription: 'For your convenience, we offer on-site laboratory services. This allows for faster turnaround times and ensures that Dr. Ramzan has the data needed to make accurate diagnoses quickly. We handle everything from routine blood work to specialized diagnostic testing.',
+            benefits: [
+              'Convenient on-site collection',
+              'Faster results for quicker diagnosis',
+              'Integrated care within the clinic',
+              'High standards of accuracy and privacy',
+              'Direct communication of results to your doctor'
+            ],
+            faqs: [
+              {
+                question: 'Do I need to fast before my blood test?',
+                answer: 'For tests like cholesterol or blood sugar, fasting for 8-12 hours is usually required. Our staff will provide specific instructions when your test is ordered.'
+              },
+              {
+                question: 'How will I receive my results?',
+                answer: 'Results are typically reviewed by Dr. Ramzan first. We will then contact you via phone or secure message, or discuss them during a follow-up visit.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/lab/1200/600'
+          },
+          {
+            id: 'wellness-counseling',
+            slug: 'wellness-counseling',
+            title: 'Wellness Counseling',
+            category: 'General Medicine',
+            icon: 'Stethoscope',
+            description: 'Personalized guidance on nutrition, exercise, and lifestyle changes to improve overall health.',
+            longDescription: 'Health is not just the absence of disease. Our wellness counseling services help you optimize your lifestyle to feel your best. We provide evidence-based advice on nutrition, weight management, stress reduction, and smoking cessation, tailored to your unique goals and challenges.',
+            benefits: [
+              'Sustainable lifestyle improvements',
+              'Improved energy and mental clarity',
+              'Weight management support',
+              'Reduced risk of lifestyle-related diseases',
+              'Personalized action plans'
+            ],
+            faqs: [
+              {
+                question: 'Is this just a diet plan?',
+                answer: 'No, wellness counseling covers all aspects of your lifestyle, including sleep, stress, and physical activity, to create a sustainable path to health.'
+              },
+              {
+                question: 'How many sessions will I need?',
+                answer: 'This varies by individual. Some patients find a single consultation helpful, while others prefer ongoing support and accountability.'
+              }
+            ],
+            image: 'https://picsum.photos/seed/wellness/1200/600'
+          }
+        ];
+
+        // --- Icons Helper ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (iconRef.current) {
+                    const LucideIcon = lucide.icons[name];
+                    if (LucideIcon) {
+                        const svg = lucide.createIcons({
+                            icons: { [name]: LucideIcon },
+                            attrs: {
+                                width: size,
+                                height: size,
+                                class: className,
+                                stroke: 'currentColor',
+                                'stroke-width': 2,
+                                fill: 'none',
+                                'stroke-linecap': 'round',
+                                'stroke-linejoin': 'round'
+                            }
+                        });
+                    }
+                }
+            }, [name, size, className]);
+
+            return <i data-lucide={name} ref={iconRef} className={className} style={{ width: size, height: size, display: 'inline-block' }}></i>;
+        };
+
+        // --- Components ---
+
+        const Header = ({ currentPage, setPage }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const navLinks = [
+                { name: 'Home', id: 'home' },
+                { name: 'Services', id: 'services' },
+                { name: 'About', id: 'about' },
+                { name: 'Blog', id: 'blog' },
+                { name: 'Contact', id: 'contact' },
+            ];
+
+            return (
+                <header className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-gray-100">
+                    <div className="container mx-auto px-4">
+                        <div className="flex items-center justify-between h-20">
+                            <div onClick={() => setPage({ id: 'home' })} className="flex items-center gap-2 text-blue-600 cursor-pointer">
+                                <div className="bg-blue-600 text-white p-2 rounded-lg">
+                                    <Icon name="Eye" size={24} />
+                                </div>
+                                <div className="flex flex-col leading-tight">
+                                    <span className="font-bold text-xl text-gray-900">Dr. Ramzan's</span>
+                                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Eye & General Clinic</span>
+                                </div>
+                            </div>
+
+                            <nav className="hidden md:flex items-center gap-8">
+                                {navLinks.map((link) => (
+                                    <button
+                                        key={link.id}
+                                        onClick={() => setPage({ id: link.id })}
+                                        className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                                            currentPage.id === link.id ? 'text-blue-600' : 'text-gray-600'
+                                        }`}
+                                    >
+                                        {link.name}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => setPage({ id: 'appointment' })}
+                                    className="bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+                                >
+                                    Book Appointment
+                                </button>
+                            </nav>
+
+                            <button className="md:hidden p-2 text-gray-600" onClick={() => setIsOpen(!isOpen)}>
+                                <Icon name={isOpen ? "X" : "Menu"} size={24} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
+                            >
+                                <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
+                                    {navLinks.map((link) => (
+                                        <button
+                                            key={link.id}
+                                            onClick={() => { setPage({ id: link.id }); setIsOpen(false); }}
+                                            className={`text-lg font-medium text-left ${
+                                                currentPage.id === link.id ? 'text-blue-600' : 'text-gray-600'
+                                            }`}
+                                        >
+                                            {link.name}
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => { setPage({ id: 'appointment' }); setIsOpen(false); }}
+                                        className="bg-blue-600 text-white px-6 py-3 rounded-xl text-center font-semibold"
+                                    >
+                                        Book Appointment
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </header>
+            );
+        };
+
+        const Footer = ({ setPage }) => (
+            <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                        <div className="space-y-6">
+                            <div onClick={() => setPage({ id: 'home' })} className="flex items-center gap-2 text-blue-400 cursor-pointer">
+                                <Icon name="Eye" size={28} />
+                                <span className="font-bold text-2xl text-white">Dr. Ramzan's</span>
+                            </div>
+                            <p className="text-sm leading-relaxed">
+                                Providing world-class eye care and general medical services in Karachi. Your health and vision are our top priorities.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 className="text-white font-bold mb-6">Quick Links</h4>
+                            <ul className="space-y-4 text-sm">
+                                <li><button onClick={() => setPage({ id: 'services' })} className="hover:text-blue-400 transition-colors">Our Services</button></li>
+                                <li><button onClick={() => setPage({ id: 'about' })} className="hover:text-blue-400 transition-colors">About Dr. Ramzan</button></li>
+                                <li><button onClick={() => setPage({ id: 'appointment' })} className="hover:text-blue-400 transition-colors">Book Appointment</button></li>
+                                <li><button onClick={() => setPage({ id: 'blog' })} className="hover:text-blue-400 transition-colors">Health Blog</button></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="text-white font-bold mb-6">Contact Us</h4>
+                            <ul className="space-y-4 text-sm">
+                                <li className="flex gap-3">
+                                    <Icon name="MapPin" size={18} className="text-blue-400 shrink-0" />
+                                    <span>Suite 101, Medical Plaza, North Nazimabad, Karachi</span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <Icon name="Phone" size={18} className="text-blue-400 shrink-0" />
+                                    <span>+92 21 3456 7890</span>
+                                </li>
+                                <li className="flex gap-3">
+                                    <Icon name="Clock" size={18} className="text-blue-400 shrink-0" />
+                                    <div>
+                                        <p>Mon - Sat: 10:00 AM - 8:00 PM</p>
+                                        <p>Sunday: Closed</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="text-white font-bold mb-6">Newsletter</h4>
+                            <p className="text-sm mb-4">Get health tips and clinic updates.</p>
+                            <div className="flex gap-2">
+                                <input type="email" placeholder="Your email" className="bg-gray-800 border-none rounded-lg px-4 py-2 text-sm w-full focus:ring-2 focus:ring-blue-500" />
+                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Join</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+                        <p>© 2026 Dr. Ramzan's Clinic. All rights reserved.</p>
+                        <div className="flex gap-6">
+                            <a href="#" className="hover:text-gray-300">Privacy Policy</a>
+                            <a href="#" className="hover:text-gray-300">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        );
+
+        const Home = ({ setPage }) => (
+            <div className="flex flex-col w-full">
+                <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+                    <div className="container mx-auto px-4 py-20 relative z-10">
+                        <div className="grid lg:grid-cols-2 gap-12 items-center">
+                            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="space-y-8">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold tracking-wide uppercase">
+                                    <Icon name="ShieldCheck" size={16} /> Trusted Eye & General Care
+                                </div>
+                                <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-900 leading-[1.1]">
+                                    Your Vision, <br />
+                                    <span className="text-blue-600">Our Mission.</span>
+                                </h1>
+                                <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
+                                    Expert eye specialist and general medicine services led by Dr. Ramzan. 
+                                    Advanced diagnostics and compassionate care for your entire family.
+                                </p>
+                                <div className="flex flex-wrap gap-4 pt-4">
+                                    <button onClick={() => setPage({ id: 'appointment' })} className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 flex items-center gap-2">
+                                        Book Appointment <Icon name="ArrowRight" size={20} />
+                                    </button>
+                                    <button onClick={() => setPage({ id: 'services' })} className="bg-white text-gray-900 border-2 border-gray-100 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all">
+                                        Our Services
+                                    </button>
+                                </div>
+                            </motion.div>
+                            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} className="relative">
+                                <div className="relative z-10 rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white">
+                                    <img src="https://picsum.photos/seed/clinic/800/1000" alt="Modern Clinic" className="w-full h-auto object-cover" />
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section className="py-24 bg-white">
+                    <div className="container mx-auto px-4">
+                        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                            <h2 className="text-4xl font-bold text-gray-900">Comprehensive Healthcare</h2>
+                            <p className="text-lg text-gray-600">We specialize in advanced ophthalmology and comprehensive general medicine.</p>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div onClick={() => setPage({ id: 'services' })} className="group p-8 rounded-[2rem] bg-blue-50 border border-blue-100 hover:bg-blue-600 transition-all duration-500 cursor-pointer">
+                                <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                                    <Icon name="Eye" size={32} className="text-blue-600" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-white transition-colors">Eye Specialist Services</h3>
+                                <p className="text-gray-600 group-hover:text-blue-50 mb-8">Cataract Surgery, Glaucoma Management, Pediatric Eye Care, and more.</p>
+                                <span className="inline-flex items-center gap-2 font-bold text-blue-600 group-hover:text-white transition-colors">Learn More <Icon name="ArrowRight" size={18} /></span>
+                            </div>
+                            <div onClick={() => setPage({ id: 'services' })} className="group p-8 rounded-[2rem] bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 transition-all duration-500 cursor-pointer">
+                                <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                                    <Icon name="Stethoscope" size={32} className="text-indigo-600" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-white transition-colors">General Medicine</h3>
+                                <p className="text-gray-600 group-hover:text-indigo-50 mb-8">Routine Checkups, Diabetes Care, Vaccinations, and Acute Illness Management.</p>
+                                <span className="inline-flex items-center gap-2 font-bold text-indigo-600 group-hover:text-white transition-colors">Learn More <Icon name="ArrowRight" size={18} /></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        );
+
+        const About = () => (
+            <div className="py-20 container mx-auto px-4">
+                <div className="grid lg:grid-cols-2 gap-16 items-center mb-32">
+                    <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+                        <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold uppercase tracking-wider">Meet Dr. Ramzan</div>
+                        <h1 className="text-5xl font-bold text-gray-900 leading-tight">Dedicated to Your <br /><span className="text-blue-600">Vision and Vitality.</span></h1>
+                        <p className="text-xl text-gray-600 leading-relaxed">Dr. Ramzan is a highly respected Eye Specialist and General Physician with over 20 years of experience serving the community in Karachi.</p>
+                        <div className="grid grid-cols-2 gap-8 pt-4">
+                            <div><p className="text-4xl font-bold text-blue-600">20+</p><p className="text-sm text-gray-500 font-medium">Years Experience</p></div>
+                            <div><p className="text-4xl font-bold text-blue-600">10k+</p><p className="text-sm text-gray-500 font-medium">Successful Surgeries</p></div>
+                        </div>
+                    </motion.div>
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="relative">
+                        <img src="https://picsum.photos/seed/drprofile/800/1000" alt="Dr. Ramzan" className="rounded-[3rem] shadow-2xl" />
+                    </motion.div>
+                </div>
+            </div>
+        );
+
+        const Services = ({ setPage }) => {
+            const eyeServices = servicesData.filter(s => s.category === 'Eye Care');
+            const generalServices = servicesData.filter(s => s.category === 'General Medicine');
+
+            const renderSection = (title, icon, color, data) => (
+                <div className="space-y-12">
+                    <div className="flex items-center gap-4 border-b border-gray-100 pb-6">
+                        <div className={`p-4 rounded-2xl bg-${color}-100 text-${color}-600`}>
+                            <Icon name={icon} size={32} />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {data.map((item) => (
+                            <div
+                                key={item.id}
+                                onClick={() => setPage({ id: 'service-detail', slug: item.slug })}
+                                className="group p-8 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer"
+                            >
+                                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">{item.title}</h3>
+                                <p className="text-gray-600 leading-relaxed text-sm mb-6 flex-1">{item.description}</p>
+                                <div className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 group-hover:gap-3 transition-all">
+                                    View Details <Icon name="ArrowRight" size={16} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="py-20 container mx-auto px-4">
+                    <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+                        <h1 className="text-5xl font-bold text-gray-900">Our Services</h1>
+                        <p className="text-xl text-gray-600">Comprehensive medical care with a focus on precision and empathy.</p>
+                    </div>
+                    <div className="space-y-32">
+                        {renderSection('Eye Specialist Services', 'Eye', 'blue', eyeServices)}
+                        {renderSection('General Medicine', 'Stethoscope', 'indigo', generalServices)}
+                    </div>
+                </div>
+            );
+        };
+
+        const ServiceDetail = ({ slug, setPage }) => {
+            const service = servicesData.find(s => s.slug === slug);
+            if (!service) return <div className="py-20 text-center">Service not found.</div>;
+
+            return (
+                <div className="py-12 lg:py-20 container mx-auto px-4">
+                    <button onClick={() => setPage({ id: 'services' })} className="inline-flex items-center gap-2 text-blue-600 font-bold mb-8 hover:gap-3 transition-all">
+                        <Icon name="ArrowLeft" size={20} /> Back to Services
+                    </button>
+                    <div className="grid lg:grid-cols-3 gap-12">
+                        <div className="lg:col-span-2 space-y-12">
+                            <div className="space-y-6">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-bold uppercase tracking-wider">{service.category}</div>
+                                <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">{service.title}</h1>
+                                <p className="text-xl text-gray-600 leading-relaxed">{service.longDescription}</p>
+                            </div>
+                            <div className="rounded-[2.5rem] overflow-hidden shadow-2xl">
+                                <img src={service.image} alt={service.title} className="w-full h-auto object-cover" />
+                            </div>
+                            <section className="space-y-8">
+                                <h2 className="text-3xl font-bold text-gray-900">Key Benefits</h2>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {service.benefits.map((b, i) => (
+                                        <div key={i} className="flex gap-4 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                            <div className="bg-green-100 text-green-600 p-2 rounded-lg h-fit"><Icon name="CheckCircle2" size={20} /></div>
+                                            <p className="text-gray-700 font-medium">{b}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                            <section className="space-y-8">
+                                <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
+                                <div className="space-y-4">
+                                    {service.faqs.map((faq, i) => (
+                                        <div key={i} className="p-8 bg-gray-50 rounded-[2rem] border border-gray-100">
+                                            <h4 className="text-lg font-bold text-gray-900 mb-3 flex gap-3"><Icon name="HelpCircle" size={24} className="text-blue-600 shrink-0" />{faq.question}</h4>
+                                            <p className="text-gray-600 leading-relaxed pl-9">{faq.answer}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+                        <div className="space-y-8">
+                            <div className="bg-blue-600 p-8 rounded-[2.5rem] text-white shadow-xl sticky top-24">
+                                <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Icon name={service.icon} size={32} /></div>
+                                <h3 className="text-2xl font-bold mb-4">Book This Service</h3>
+                                <button onClick={() => setPage({ id: 'appointment' })} className="block w-full bg-white text-blue-600 py-4 rounded-xl font-bold text-center hover:bg-blue-50 transition-all shadow-lg mb-4">Schedule Appointment</button>
+                                <a href="tel:+922134567890" className="flex items-center justify-center gap-2 w-full bg-blue-700 text-white border border-blue-500 py-4 rounded-xl font-bold hover:bg-blue-800 transition-all"><Icon name="Phone" size={20} /> Call Clinic</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Appointment = () => {
+            const [submitted, setSubmitted] = useState(false);
+            if (submitted) return (
+                <div className="min-h-[60vh] flex items-center justify-center text-center p-4">
+                    <div className="bg-white p-12 rounded-[2.5rem] shadow-2xl max-w-xl border border-gray-100">
+                        <Icon name="CheckCircle2" size={64} className="text-green-500 mx-auto mb-6" />
+                        <h2 className="text-3xl font-bold mb-4">Request Received!</h2>
+                        <p className="text-gray-600 mb-8">We'll contact you shortly to confirm your appointment.</p>
+                        <button onClick={() => setSubmitted(false)} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold">Book Another</button>
+                    </div>
+                </div>
+            );
+            return (
+                <div className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-4 max-w-4xl">
+                        <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100">
+                            <h2 className="text-3xl font-bold mb-8">Book Appointment</h2>
+                            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <input required type="text" placeholder="Full Name" className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500" />
+                                    <input required type="tel" placeholder="Phone Number" className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <input required type="email" placeholder="Email Address" className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500" />
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <input required type="date" className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500" />
+                                    <select required className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Time</option>
+                                        <option>10:00 AM</option><option>12:00 PM</option><option>05:00 PM</option>
+                                    </select>
+                                </div>
+                                <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all">Confirm Request</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Contact = () => (
+            <div className="py-20 container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <h1 className="text-5xl font-bold text-gray-900 mb-4">Contact Us</h1>
+                    <p className="text-xl text-gray-600">We're here to help. Reach out via any channel.</p>
+                </div>
+                <div className="grid lg:grid-cols-3 gap-8 mb-20">
+                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 text-center space-y-4">
+                        <Icon name="Phone" size={32} className="text-blue-600 mx-auto" />
+                        <h3 className="text-xl font-bold">+92 21 3456 7890</h3>
+                        <p className="text-sm text-gray-500">Mon - Sat, 10am - 8pm</p>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 text-center space-y-4">
+                        <Icon name="Mail" size={32} className="text-indigo-600 mx-auto" />
+                        <h3 className="text-xl font-bold">info@drramzanclinic.com</h3>
+                        <p className="text-sm text-gray-500">Reply within 24 hours</p>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 text-center space-y-4">
+                        <Icon name="MessageCircle" size={32} className="text-green-600 mx-auto" />
+                        <h3 className="text-xl font-bold">+92 300 1234567</h3>
+                        <p className="text-sm text-gray-500">WhatsApp Support</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const Blog = () => (
+            <div className="py-20 container mx-auto px-4">
+                <h1 className="text-5xl font-bold text-gray-900 mb-16">Health Blog</h1>
+                <div className="grid md:grid-cols-2 gap-12">
+                    {[1, 2].map(i => (
+                        <article key={i} className="group cursor-pointer">
+                            <div className="relative aspect-[16/9] rounded-[2.5rem] overflow-hidden mb-6 shadow-lg">
+                                <img src={`https://picsum.photos/seed/blog${i}/800/500`} alt="Blog" className="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                            </div>
+                            <h2 className="text-2xl font-bold mb-4 group-hover:text-blue-600">Health Tip #{i}: Maintaining Vision</h2>
+                            <p className="text-gray-600 mb-4">Expert medical advice and health tips from Dr. Ramzan and his team.</p>
+                            <span className="font-bold text-blue-600 flex items-center gap-2">Read More <Icon name="ArrowRight" size={18} /></span>
+                        </article>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const Chatbot = () => {
+            const [isOpen, setIsOpen] = useState(false);
+            const [messages, setMessages] = useState([{ role: 'bot', text: "Hello! I'm Dr. Ramzan's AI assistant. How can I help you today?" }]);
+            const [input, setInput] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleSend = async () => {
+                if (!input.trim()) return;
+                const userMsg = input;
+                setInput('');
+                setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+                setLoading(true);
+                
+                // Mock response for standalone version
+                setTimeout(() => {
+                    setMessages(prev => [...prev, { role: 'bot', text: "Thank you for your inquiry. For medical advice, please book an appointment with Dr. Ramzan. (Standalone version uses mock responses)." }]);
+                    setLoading(false);
+                }, 1000);
+            };
+
+            return (
+                <div className="fixed bottom-24 right-6 z-50">
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 overflow-hidden border border-gray-100 mb-4 flex flex-col h-[500px]">
+                                <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
+                                    <div className="flex items-center gap-2"><Icon name="Stethoscope" size={20} /> <span className="font-semibold">Symptom Checker</span></div>
+                                    <button onClick={() => setIsOpen(false)}><Icon name="X" size={20} /></button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                                    {messages.map((m, i) => (
+                                        <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-white border border-gray-100 shadow-sm'}`}>{m.text}</div>
+                                        </div>
+                                    ))}
+                                    {loading && <div className="text-blue-600 animate-pulse text-xs">AI is thinking...</div>}
+                                </div>
+                                <div className="p-4 bg-white border-t border-gray-100 flex gap-2">
+                                    <input value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleSend()} placeholder="Describe symptoms..." className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm focus:outline-none" />
+                                    <button onClick={handleSend} className="bg-blue-600 text-white p-2 rounded-full"><Icon name="Send" size={18} /></button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                    <button onClick={() => setIsOpen(!isOpen)} className="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all flex items-center gap-2 group">
+                        <Icon name="MessageSquare" size={24} />
+                        {!isOpen && <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap text-sm font-medium">Symptom Checker</span>}
+                    </button>
+                </div>
+            );
+        };
+
+        const WhatsAppButton = () => (
+            <a href="https://wa.me/923001234567" target="_blank" className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all flex items-center gap-2 group">
+                <Icon name="MessageCircle" size={24} />
+                <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap text-sm font-medium">WhatsApp Us</span>
+            </a>
+        );
+
+        // --- Main App ---
+
+        const App = () => {
+            const [page, setPage] = useState({ id: 'home' });
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [page]);
+
+            const renderPage = () => {
+                switch(page.id) {
+                    case 'home': return <Home setPage={setPage} />;
+                    case 'about': return <About />;
+                    case 'services': return <Services setPage={setPage} />;
+                    case 'service-detail': return <ServiceDetail slug={page.slug} setPage={setPage} />;
+                    case 'appointment': return <Appointment />;
+                    case 'contact': return <Contact />;
+                    case 'blog': return <Blog />;
+                    default: return <Home setPage={setPage} />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    <Header currentPage={page} setPage={setPage} />
+                    <main className="flex-1">
+                        <AnimatePresence mode="wait">
+                            <motion.div key={page.id + (page.slug || '')} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                                {renderPage()}
+                            </motion.div>
+                        </AnimatePresence>
+                    </main>
+                    <Footer setPage={setPage} />
+                    <WhatsAppButton />
+                    <Chatbot />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
